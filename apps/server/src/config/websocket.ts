@@ -34,7 +34,20 @@ wss.on('connection', (socket) => {
 })
 
 // reading all the redis messages from subscribed channel----------
-// redis.on("message", (cha))
+redis.on("message", (pattern: string, channel: string, message: string) => {
+    try {
+        const [, token] = channel.split(':');
+        const payload = JSON.parse(message);
+        wss.to(token).emit("submission-updated", payload);
+    } catch (err) {
+        console.error("Malformed pubsub message", err);
+    }
+})
+
+redis.psubscribe("submission:*", (err) => {
+    if (err) console.error("Error while listening the redis server")
+    else console.log("Subscribe to all the channels");
+})
 
 
 export { app, server } 
