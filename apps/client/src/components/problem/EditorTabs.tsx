@@ -20,11 +20,10 @@ export const EditorTabs: React.FC<EditorTabsProps> = ({ activeTab, onTabChange }
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
-          className={`py-2 border-b-2 transition-colors text-sm ${
-            activeTab === tab.id
-              ? 'border-primary-500 text-dark-50'
-              : 'border-transparent text-dark-400 hover:text-dark-300'
-          }`}
+          className={`py-2 border-b-2 transition-colors text-sm ${activeTab === tab.id
+            ? 'border-primary-500 text-dark-50'
+            : 'border-transparent text-dark-400 hover:text-dark-300'
+            }`}
         >
           {tab.label}
         </button>

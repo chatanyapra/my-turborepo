@@ -1,7 +1,14 @@
 import express from "express";
-const app = express();
+import cors from 'cors';
 import submitRoute from "./routes/submitroute"
 
+const app = express();
+app.use(cors()); // default allows all origins
+// app.use(cors({
+//     origin: 'http://localhost:4000', // frontend origin
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     credentials: true
+// }));
 app.use(express.json());
 
 app.use("/submit", submitRoute);

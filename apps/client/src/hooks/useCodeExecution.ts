@@ -1,48 +1,56 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { socket } from "../utils/socket";
+import axios from 'axios';
 
 export const useCodeExecution = () => {
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
+  const [token, setToken] = useState("");
+  const [code, setCode] = useState(`print("Hello, World!")`);
 
-  const runCode = () => {
+  useEffect(() => {
+    socket.on("submission-update", (data) => {
+      setOutput(data.output);
+    });
+    return () => {
+      socket.off("submission-update");
+    };
+  }, [])
+
+  const runCode = async (code: string) => {
     setIsRunning(true);
     setOutput('Running test cases...\n');
+    setCode(code);
 
-    // Simulate code execution - Replace with actual API call
-    setTimeout(() => {
-      setOutput(`Running test cases...
-      
-✓ Test Case 1: Passed
-  Input: nums = [2,7,11,15], target = 9
-  Expected: [0,1]
-  Output: [0,1]
-  Runtime: 2ms
+    try {
+      const { data } = await axios.post("http://localhost:3000/submit", {
+        source_code: code,
+        language_id: 71,
+        stdin: "",
+      });
 
-✓ Test Case 2: Passed
-  Input: nums = [3,2,4], target = 6
-  Expected: [1,2]
-  Output: [1,2]
-  Runtime: 1ms
-
-All test cases passed! (2/2)`);
-      setIsRunning(false);
-    }, 1500);
+      setToken(data.token);
+      socket.emit("subscribe", data.token);
+    } catch (err) {
+      console.error(err);
+      setCode("Error submitting job");
+    }
   };
 
-  const submitCode = () => {
+  const submitCode = (code: string) => {
     setIsRunning(true);
     setOutput('Submitting your solution...\n');
 
     // Simulate code submission - Replace with actual API call
     setTimeout(() => {
+
       setOutput(`Submitting your solution...
+          ✓ Accepted
 
-✓ Accepted
+          Runtime: 52ms (Beats 95.2% of users)
+          Memory: 42.1MB (Beats 87.3% of users)
 
-Runtime: 52ms (Beats 95.2% of users)
-Memory: 42.1MB (Beats 87.3% of users)
-
-All 58 test cases passed!`);
+          All 58 test cases passed!`);
       setIsRunning(false);
     }, 2000);
   };

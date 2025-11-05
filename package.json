@@ -25,7 +25,8 @@
     "packages/*"
   ],
   "dependencies": {
-    "@turbo/gen": "^2.5.8"
+    "@turbo/gen": "^2.5.8",
+    "cors": "^2.8.5"
   },
   "version": "1.0.0",
   "description": "This Turborepo starter is maintained by the Turborepo core team.",

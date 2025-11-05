@@ -36,18 +36,18 @@ export const ProblemDetail: React.FC = () => {
 
   const handleRunCode = () => {
     setEditorTab('output');
-    runCode();
+    runCode(code);
   };
 
   const handleSubmit = () => {
     setEditorTab('output');
-    submitCode();
+    submitCode(code);
   };
 
   return (
     <div className="min-h-screen bg-dark-950 flex flex-col">
       <Navbar />
-      
+
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Left Panel - Problem Description */}
         <div className="lg:w-1/2 flex flex-col border-r border-dark-800 overflow-hidden">
@@ -73,7 +73,7 @@ export const ProblemDetail: React.FC = () => {
             onSubmit={handleSubmit}
             isRunning={isRunning}
           />
-          
+
           <EditorTabs activeTab={editorTab} onTabChange={setEditorTab} />
 
           <div className="flex-1 overflow-hidden">
