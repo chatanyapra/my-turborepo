@@ -1,23 +1,13 @@
-import express from "express";
-import cors from 'cors';
 import submitRoute from "./routes/submitroute"
+import { app, server } from "./config/websocket";
 
-const app = express();
-app.use(cors()); // default allows all origins
-// app.use(cors({
-//     origin: 'http://localhost:4000', // frontend origin
-//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-//     credentials: true
-// }));
-app.use(express.json());
+app.use("/api", submitRoute);
 
-app.use("/submit", submitRoute);
+app.get("/", async (req, res) => {
+    console.log("Server working");
 
-// app.get("/", async (req, res) => {
-//     console.log("Server working");
+})
 
-// })
-
-app.listen(3000, () => {
+server.listen(3000, () => {
     console.log("server running on port 3000");
 })

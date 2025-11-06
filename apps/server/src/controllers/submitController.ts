@@ -4,12 +4,14 @@ import { v4 as uuid } from "uuid";
 import { codeQueue } from "../config/bullMQ";
 
 export const submitController = async (req: Request<{}, {}, RequestWithBody>, res: Response): Promise<void> => {
-    const { userid, code, language_id, stdin } = req.body;
+    const { source_code: code, language_id, stdin } = req.body;
     const token = uuid();
-    console.log(userid, code, language_id, stdin);
+    console.log("code, language_id, stdin==========", code, language_id, stdin);
 
     // adding to queue-----------
-    const jobresult = await codeQueue.add("run-code", { token: token, userid: userid, language_id: language_id, code: code, stdin });
+    const jobresult = await codeQueue.add("codeQueue", { token: token, language_id: language_id, code: code, stdin });
+    console.log("jobresult============", jobresult);
+
     if (res) {
         res.json({ token, job_id: jobresult.id });
     }

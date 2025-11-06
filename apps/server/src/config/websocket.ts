@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import Redis from "ioredis";
 import http from "http";
 import express from "express";
+import cors from 'cors';
 
 const app = express();
 const server = http.createServer(app);
@@ -11,17 +12,25 @@ const REDIS_PORT = Number(process.env.REDIS_PORT || 6379);
 
 const redis = new Redis({ host: REDIS_HOST, port: REDIS_PORT });
 
+// app.use(cors()); // default allows all origins
+app.use(cors({
+    origin: 'http://localhost:4000', // frontend origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    // credentials: true
+}));
+app.use(express.json());
+
 const wss = new Server(server, {
     cors: {
-        origin: ['*'],
-        // origin: [`http://localhost:4000`],
-        // methods: ['GET', 'POST'],
+        // origin: ['*'],
+        origin: [`http://localhost:4000`],
+        methods: ['GET', 'POST'],
         // credentials: true
     }
 })
 
 wss.on('connection', (socket) => {
-    console.log("socket id", socket.id);
+    console.log("🟢 Socket connected:", socket.id);
 
     socket.on("subscribe", (token) => {
         if (!token) return;
@@ -29,7 +38,7 @@ wss.on('connection', (socket) => {
         console.log("connection built between client and server");
     })
     socket.on("disconnect", () => {
-        console.log("socket disconnected", socket.id);
+        console.log("🔴 Socket disconnected:", socket.id);
     })
 })
 

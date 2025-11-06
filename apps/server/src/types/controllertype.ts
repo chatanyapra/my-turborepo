@@ -8,7 +8,7 @@ export interface SubmitBody {
 
 export interface RequestWithBody {
     userid: string,
-    code: string,
+    source_code: string,
     language_id: number,
     stdin?: string
 }
