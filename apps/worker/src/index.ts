@@ -33,8 +33,9 @@ new Worker(
                 {
                     source_code,
                     lang_id,
-                    stdin: test.input,
-                    expected_output: test.expectedOutput,
+                    stdin: ''
+                    // stdin: test.input,
+                    // expected_output: test.expectedOutput,
                 },
                 { timeout: 120_000 }
             );

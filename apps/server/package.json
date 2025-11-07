@@ -1,30 +1,37 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "build": "npx tsc",
-    "dev": "node dist/index.js",
-    "start": "node dist/index.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/express": "^5.0.5",
-    "@types/uuid": "^10.0.0",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "bullmq": "^5.61.2",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "pg": "^8.16.3",
-    "socket.io": "^4.8.1",
-    "uuid": "^13.0.0",
-    "zod": "^4.1.12"
-  },
-  "description": ""
+    "name": "server",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "build": "npx tsc",
+        "dev": "npx tsc",
+        "start": "node dist/index.js",
+        "prisma:generate": "npx prisma generate",
+        "prisma:push": "npx prisma db push",
+        "prisma:migrate": "npx prisma migrate dev",
+        "prisma:studio": "npx prisma studio",
+        "prisma:reset": "npx prisma migrate reset"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/express": "^5.0.5",
+        "@types/uuid": "^10.0.0",
+        "typescript": "^5.9.3"
+    },
+    "dependencies": {
+        "@prisma/client": "^6.19.0",
+        "bcrypt": "^6.0.0",
+        "bullmq": "^5.61.2",
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.3",
+        "express": "^5.1.0",
+        "pg": "^8.16.3",
+        "prisma": "^6.19.0",
+        "socket.io": "^4.8.1",
+        "uuid": "^13.0.0",
+        "zod": "^4.1.12"
+    },
+    "description": ""
 }
