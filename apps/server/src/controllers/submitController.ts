@@ -7,7 +7,6 @@ export const submitController = async (req: Request<{}, {}, RequestWithBody>, re
     const { source_code: code, language_id, stdin } = req.body;
     const token = uuid();
     console.log("code, language_id, stdin==========", code, language_id, stdin);
-
     // adding to queue-----------
     const jobresult = await codeQueue.add("codeQueue", { token: token, language_id: language_id, code: code, stdin });
     console.log("jobresult============", jobresult);

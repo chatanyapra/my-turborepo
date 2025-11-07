@@ -25,7 +25,9 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
       </div>
 
       <div className="flex items-center space-x-2">
-        <Button variant="secondary" size="sm" onClick={onRunCode} disabled={isRunning}>
+        <Button variant="secondary" size="sm" onClick={onRunCode}
+          disabled={isRunning}
+        >
           <Play size={16} className="mr-2" />
           Run Code
         </Button>

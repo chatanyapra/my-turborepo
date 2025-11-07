@@ -16,7 +16,8 @@ const pub = new Redis.default({
 // });
 
 
-function publishStatus(token: string, status: string, output = "") {
+async function publishStatus(token: string, status: string, output = "") {
+    await new Promise(resolve => setTimeout(resolve, 1000));
     pub.publish(`submission:${token}`, JSON.stringify({ status, output }))
 }
 
@@ -24,22 +25,24 @@ new Worker(
     "codeQueue",
     async (job) => {
         const { token, source_code, language_id: lang_id, stdin = '' } = job.data;
-        // console.log("job.data++++++++++++++++++++", job.data);
         console.log("👷 Worker received job:", job.id);
-        console.log("📦 Job data:", token);
-
-        publishStatus(token, "Running");
+        console.log("📦 Job token:", token);
         try {
             const { data } = await axios.post(
                 `${JUDGE0_URL}/submissions?base64_encoded=false&wait=true`,
-                { source_code, lang_id, stdin },
+                {
+                    source_code,
+                    lang_id,
+                    stdin: test.input,
+                    expected_output: test.expectedOutput,
+                },
                 { timeout: 120_000 }
             );
             console.log("data of worker queur====", data);
 
-            const out = data.stdout ?? 'System error By chatanya pratap';
+            const out = 'System error By chatanya pratap';
             publishStatus(token, "Completed", out);
-            return data;
+            return out;
         } catch (err) {
             console.error("error in uploading to docker server! ", err);
             publishStatus(token, "Failed", "Execution error");

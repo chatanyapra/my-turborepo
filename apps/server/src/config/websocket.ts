@@ -32,22 +32,29 @@ const wss = new Server(server, {
 wss.on('connection', (socket) => {
     console.log("🟢 Socket connected:", socket.id);
 
-    socket.on("subscribe", (token) => {
+    socket.on("subscribe", (token, callback) => {
         if (!token) return;
         socket.join(token);
+        console.log(`✅ ${socket.id} joined room: ${token}`);
         console.log("connection built between client and server");
-    })
+        callback && callback({ joined: true });
+    });
+
     socket.on("disconnect", () => {
         console.log("🔴 Socket disconnected:", socket.id);
     })
 })
 
 // reading all the redis messages from subscribed channel----------
-redis.on("message", (pattern: string, channel: string, message: string) => {
+redis.on("pmessage", async (pattern: string, channel: string, message: string) => {
     try {
         const [, token] = channel.split(':');
+        console.log("channel----", channel);
+        console.log("token in backend----", token);
         const payload = JSON.parse(message);
-        wss.to(token).emit("submission-updated", payload);
+        console.log("payload---", payload);
+
+        wss.to(token).emit("submission-update", payload);
     } catch (err) {
         console.error("Malformed pubsub message", err);
     }

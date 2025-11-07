@@ -2,49 +2,72 @@ import { useEffect, useState } from 'react';
 import socket from "../utils/socket";
 import axios from 'axios';
 
+interface SubmissionUpdate {
+  output: string;
+  status?: string;
+  error?: string;
+  [key: string]: any;
+}
+
 export const useCodeExecution = () => {
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [token, setToken] = useState("");
-  const [code, setCode] = useState(`print("Hello, World!")`);
+  console.log("token client", token);
 
-  console.log("token--------", token);
-  console.log("code--------", code);
 
   useEffect(() => {
-    socket.on("submission-update", (data) => {
-      console.log("Code solutions in client server data.output*************- ", data.output);
+    const handleUpdate = (data: SubmissionUpdate) => {
+      console.log("📩 Received submission update:", data);
 
-      setOutput(data.output);
-    });
-    return () => {
-      socket.off("submission-update");
+      if (data.error) {
+        setOutput(`❌ Error: ${data.error}`);
+      } else if (data.status === 'failed') {
+        setOutput('❌ Execution failed. Please try again.');
+      } else {
+        setOutput(data.output || '✅ Code executed successfully!');
+      }
+
+      // ✅ Stop spinner
+      setIsRunning(false);
     };
-  }, [])
+
+    socket.on("submission-update", handleUpdate);
+
+    return () => {
+      socket.off("submission-update", handleUpdate);
+    };
+  }, []);
 
   const runCode = async (code: string) => {
     setIsRunning(true);
     setOutput('Running test cases...\n');
-    setCode(code);
-    console.log("code========+++++++++++++++++++++++", code);
-
 
     try {
       const { data } = await axios.post("http://localhost:3000/api/submit", {
         source_code: code,
         language_id: 71,
         stdin: "",
+        expected_output: ""
       }, {
-        withCredentials: false, // ✅ CORS safe since credentials aren't used
+        withCredentials: false,
       });
 
-      console.log("data=================================", data);
-
-      socket.emit("subscribe", data.token);
+      console.log("🚀 Job submitted:", data);
       setToken(data.token);
-    } catch (err) {
-      console.error(err);
-      setCode("Error submitting job");
+      socket.emit("subscribe", data.token, (ack: any) => {
+        console.log("🔗 Joined room:", ack);
+      });
+
+      // Safety timeout: If result not received within 15s, auto-stop spinner
+      setTimeout(() => {
+        setIsRunning(false);
+      }, 15000);
+
+    } catch (err: any) {
+      console.error("❌ Error submitting code:", err);
+      setOutput("Error submitting job. Please check your connection.");
+      setIsRunning(false);
     }
   };
 
