@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { toast } from "react-toastify";
+import { useAuthContext } from '../context/AuthContext';
 
 interface LoginData {
     email?: string;
@@ -21,7 +22,7 @@ function handleInputError({ username, password }: LoginData): boolean {
 
 const useLogin = () => {
     const [loading, setLoading] = useState<boolean>(false);
-    // const { setAuthUser } = useAuthContext();
+    const { setAuthUser } = useAuthContext();
 
     const login = async ({ email, password }: LoginData) => {
         const success = handleInputError({ email, password });
@@ -29,7 +30,7 @@ const useLogin = () => {
 
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:3000/`, {
+            const res = await fetch(`http://localhost:3000/api/user/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
@@ -39,11 +40,11 @@ const useLogin = () => {
             if (data.error) {
                 throw new Error(data.error);
             }
-            localStorage.setItem("codura", JSON.stringify(data));
-            // setAuthUser(data);
-            toast.success("Login successful! Welcome back!"); // Success message
+            localStorage.setItem("codura-token", JSON.stringify(data.token));
+            setAuthUser(data);
+            toast.success("Login successful! Welcome back!");
         } catch (error: any) {
-            toast.error(error.message); // Error message
+            toast.error(error.message);
         } finally {
             setLoading(false);
         }

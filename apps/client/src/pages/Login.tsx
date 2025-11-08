@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, Github } from 'lucide-react';
 import { Button, Input, Card } from '../components/ui';
+import useLogin from '../hooks/useLogin';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { login } = useLogin();
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -30,7 +32,7 @@ export const Login: React.FC = () => {
     }
 
     // Handle login logic here
-    console.log('Login:', { email, password });
+    login({ email, password });
   };
 
   return (
