@@ -1,6 +1,8 @@
 import { Worker } from "bullmq";
 import axios from "axios";
 import Redis from "ioredis";
+import submissionService from "./services/submission.service.js";
+import type { CreateSubmissionDTO } from "./types/index.js";
 
 const JUDGE0_URL = process.env.JUDGE0_URL || "http://localhost:2358";
 const REDIS_HOST = process.env.REDIS_HOST || "localhost";
@@ -42,8 +44,19 @@ new Worker(
             console.log("data of worker queur====", data);
 
             const out = 'System error By chatanya pratap';
+
+            const passdata: CreateSubmissionDTO = {
+                userId: 12,
+                problemId: 123,
+                code: source_code,
+                language: lang_id,
+            }
+            // submit code of user in db
+            submissionService.createSubmission(passdata)
+
             publishStatus(token, "Completed", out);
             return out;
+
         } catch (err) {
             console.error("error in uploading to docker server! ", err);
             publishStatus(token, "Failed", "Execution error");

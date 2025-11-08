@@ -1,25 +1,12 @@
-import { Request, Response } from 'express';
-import { asyncHandler, AppError } from '../middleware/errorHandler';
-import jwt from 'jsonwebtoken';
-import userService from '../services/user.service';
+import type { Request, Response } from "express";
+import { AppError, asyncHandler } from "../middleware/errorHandler.js";
+import userService from "../services/user.service.js";
 
-interface User {
-  id: string;
-  email: string;
-  password: string;
-}
 
-interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-interface LoginResponse {
-  token: string;
-}
 class UserController {
   createUser = asyncHandler(async (req: Request, res: Response) => {
     const user = await userService.createUser(req.body);
+
     res.status(201).json({
       success: true,
       message: 'User created successfully',
@@ -28,7 +15,7 @@ class UserController {
   });
 
   getUserById = asyncHandler(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id || '0');
     const user = await userService.getUserById(id);
 
     if (!user) {
@@ -89,7 +76,7 @@ class UserController {
   });
 
   updateUser = asyncHandler(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id || '0');
     const user = await userService.updateUser(id, req.body);
 
     res.status(200).json({
@@ -100,7 +87,7 @@ class UserController {
   });
 
   deleteUser = asyncHandler(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id || '0');
     const deleted = await userService.deleteUser(id);
 
     if (!deleted) {
@@ -115,33 +102,16 @@ class UserController {
 
   login = asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = req.body;
-
     const user = await userService.verifyPassword(email, password);
+
     if (!user) {
       throw new AppError('Invalid email or password', 401);
     }
 
-    // Ensure JWT secret is available
-    if (!process.env.JWT_SECRET) {
-      throw new Error('JWT_SECRET is not defined in environment variables');
-    }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' } // ⏱️ 1 hour expiration
-    );
-
     res.status(200).json({
       success: true,
       message: 'Login successful',
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-      },
+      data: user,
     });
   });
 }

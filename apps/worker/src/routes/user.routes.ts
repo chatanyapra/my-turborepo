@@ -1,8 +1,7 @@
 import { Router } from 'express';
-import userController from '../controllers/user.controller';
-import { validate } from '../middleware/validator';
-import { createUserSchema, updateUserSchema, loginSchema } from '../validators';
-import { authenticate } from '../middleware/authenticate';
+import { validate } from '../middleware/validator.js';
+import { createUserSchema, loginSchema, updateUserSchema } from '../validators/index.js';
+import userController from '../controllers/user.controller.js';
 
 const router = Router();
 
@@ -16,6 +15,6 @@ router.put('/:id', validate(updateUserSchema), userController.updateUser);
 router.delete('/:id', userController.deleteUser);
 
 // Authentication
-router.post('/login', validate(loginSchema), authenticate, userController.login);
+router.post('/login', validate(loginSchema), userController.login);
 
 export default router;
