@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Github } from 'lucide-react';
 import { Button, Input, Card } from '../components/ui';
 import useLogin from '../hooks/useLogin';
@@ -8,9 +8,10 @@ export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useLogin();
+  const navigate = useNavigate();
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: { email?: string; password?: string } = {};
 
@@ -32,7 +33,10 @@ export const Login: React.FC = () => {
     }
 
     // Handle login logic here
-    login({ email, password });
+    const loginResult = await login({ email, password });
+    if (loginResult) {
+      navigate('/dashboard');
+    }
   };
 
   return (

@@ -33,6 +33,8 @@ class UserService {
         role: data.role || 'user',
       },
     });
+    console.log("user in controller- ", user);
+
 
     return this.sanitizeUser(user);
   }

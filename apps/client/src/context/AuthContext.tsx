@@ -19,6 +19,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ childr
     const [authUser, setAuthUser] = useState<AuthUser | null>(
         JSON.parse(localStorage.getItem("codura-token") || "null")
     );
+    console.log("authUser", authUser);
 
     return (
         <AuthContext.Provider value={{ authUser, setAuthUser }}>

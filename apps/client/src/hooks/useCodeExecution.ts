@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import socket from "../utils/socket";
 import axios from 'axios';
+import { useAuthContext } from '../context/AuthContext';
 
 interface SubmissionUpdate {
   output: string;
@@ -13,6 +14,7 @@ export const useCodeExecution = () => {
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [token, setToken] = useState("");
+  const { authUser } = useAuthContext();
   console.log("token client", token);
 
 
@@ -44,15 +46,20 @@ export const useCodeExecution = () => {
     setOutput('Running test cases...\n');
 
     try {
+      console.log("authUser?.token", authUser?.token);
+
       const { data } = await axios.post("http://localhost:3000/api/submit", {
         source_code: code,
         language_id: 71,
         stdin: "",
         expected_output: ""
       }, {
-        withCredentials: false,
-      });
-
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authUser?.token}`,
+        },
+      }
+      );
       console.log("🚀 Job submitted:", data);
       setToken(data.token);
       socket.emit("subscribe", data.token, (ack: any) => {
