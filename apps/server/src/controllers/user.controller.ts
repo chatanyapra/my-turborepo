@@ -17,6 +17,7 @@ interface LoginRequest {
 interface LoginResponse {
   token: string;
 }
+
 class UserController {
   createUser = asyncHandler(async (req: Request, res: Response) => {
     const user = await userService.createUser(req.body);
@@ -24,6 +25,32 @@ class UserController {
       success: true,
       message: 'User created successfully',
       data: user,
+    });
+  });
+
+  signup = asyncHandler(async (req: Request, res: Response) => {
+    const user = await userService.createUser(req.body);
+
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not defined in environment variables');
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+
+    res.status(201).json({
+      success: true,
+      message: 'Signup successful',
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      },
     });
   });
 

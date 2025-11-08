@@ -5,6 +5,7 @@ export interface AuthUser {
     name: string;
     email: string;
     image?: string;
+    token: string;
 }
 export interface AuthContextProps {
     authUser: AuthUser | null;

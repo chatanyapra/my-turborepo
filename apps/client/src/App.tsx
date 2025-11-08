@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Login, Signup, Dashboard, ProblemDetail } from './pages';
 import { useAuthContext } from './context/AuthContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const { authUser } = useAuthContext();
@@ -8,21 +10,22 @@ function App() {
     <Router>
       <Routes>
         {
-          authUser ? (
-            <>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/problem/:id" element={<ProblemDetail />} />
-            </>
-          ) : (
+          !authUser ? (
             <>
               <Route path="/" element={<Navigate to="/login" replace />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="*" element={<Navigate to="/login" replace />} />
             </>
+          ) : (
+            <>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/problem/:id" element={<ProblemDetail />} />
+            </>
           )
         }
       </Routes>
+      <ToastContainer />
     </Router>
   );
 }

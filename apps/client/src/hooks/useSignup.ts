@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { toast } from "react-toastify";
 import { useAuthContext } from '../context/AuthContext';
-import type { SignupData } from '../types';
 
-function handleInputError({ fullname, username, password, confirmPassword }: SignupData): boolean {
-    if (!fullname || !username || !password || !confirmPassword) {
+function handleInputError({ username, email, password, confirmPassword }: any): boolean {
+    if (!username || !email || !password || !confirmPassword) {
         toast.error('Please fill in all fields');
         return false;
     }
@@ -23,28 +22,35 @@ const useSignup = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const { setAuthUser } = useAuthContext();
 
-    const signup = async ({ fullname, username, password, confirmPassword }: SignupData) => {
-        const success = handleInputError({ fullname, username, password, confirmPassword });
+    const signup = async ({ username, email, password, confirmPassword }: any) => {
+        const success = handleInputError({ username, email, password, confirmPassword });
         if (!success) return;
 
         setLoading(true);
         try {
-            const res = await fetch(`/api/auth/signup`, {
+            const res = await fetch(`http://localhost:3000/api/users/signup`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ fullname, username, password, confirmPassword }),
+                body: JSON.stringify({ username, email, password }),
             });
 
             const data = await res.json();
-            if (data.error) {
-                throw new Error(data.error);
-            } else {
-                localStorage.setItem("auramic-socialmedia-logged-user", JSON.stringify(data));
-                setAuthUser(data);
-                toast.success("Signup successful! Welcome!"); // Success message
+            if (!res.ok) {
+                console.log(data.errors[0].message);
+                throw new Error(data?.errors[0].message || data?.message || 'Signup failed');
             }
+            console.log("JSON.stringify(data.token)", JSON.stringify(data.token));
+            if (data.token) {
+                localStorage.setItem("codura-token", JSON.stringify(data));
+                setAuthUser(data);
+                toast.success("Signup successful! Welcome!");
+                return true;
+            }
+            toast.error("You are not authorized to signup");
+            return false;
         } catch (error: any) {
-            toast.error(error.message); // Error message
+            toast.error(error.message);
+            return false;
         } finally {
             setLoading(false);
         }

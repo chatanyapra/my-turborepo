@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int           @id @default(autoincrement())
+  username      String        @unique @db.VarChar(50)
+  email         String        @unique @db.VarChar(100)
+  password_hash String        @db.Text
+  profile_image String?       @db.Text
+  role          String        @default("user") @db.VarChar(20)
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+
+  problems      Problem[]     @relation("UserProblems")
+  submissions   Submission[]
+}
+
+model Problem {
+  id            Int           @id @default(autoincrement())
+  title         String        @db.VarChar(255)
+  description   String        @db.Text
+  difficulty    String        @db.VarChar(10)
+  constraints   String        @db.Text
+  examples      Json
+  test_cases    Json
+  tags          String[]      @db.Text
+  time_limit    Int           @default(1)
+  memory_limit  Int           @default(128)
+  created_by    Int
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+
+  createdBy     User          @relation("UserProblems", fields: [created_by], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  submissions   Submission[]
+}
+
+model Submission {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  problem_id  Int
+  code        String    @db.Text
+  language    String    @db.VarChar(20)
+  status      String    @db.VarChar(50)
+  runtime     Int?
+  memory      Int?
+  created_at  DateTime  @default(now())
+
+  user        User      @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  problem     Problem   @relation(fields: [problem_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}

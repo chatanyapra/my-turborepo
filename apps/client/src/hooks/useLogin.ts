@@ -4,12 +4,11 @@ import { useAuthContext } from '../context/AuthContext';
 
 interface LoginData {
     email?: string;
-    username?: string;
     password: string;
 }
 
-function handleInputError({ username, password }: LoginData): boolean {
-    if (!username || !password) {
+function handleInputError({ email, password }: LoginData): boolean {
+    if (!email || !password) {
         toast.error('Please fill in all fields');
         return false;
     }
@@ -30,7 +29,7 @@ const useLogin = () => {
 
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:3000/api/user/login`, {
+            const res = await fetch(`http://localhost:3000/api/users/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
@@ -40,11 +39,18 @@ const useLogin = () => {
             if (data.error) {
                 throw new Error(data.error);
             }
-            localStorage.setItem("codura-token", JSON.stringify(data.token));
-            setAuthUser(data);
-            toast.success("Login successful! Welcome back!");
+            console.log("JSON.stringify(data.token)", JSON.stringify(data.token));
+            if (data.token) {
+                localStorage.setItem("codura-token", JSON.stringify(data));
+                setAuthUser(data);
+                toast.success("Login successful! Welcome back!");
+                return true;
+            }
+            toast.error("You are not authorized to login");
+            return false;
         } catch (error: any) {
             toast.error(error.message);
+            return false;
         } finally {
             setLoading(false);
         }

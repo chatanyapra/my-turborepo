@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, Github } from 'lucide-react';
 import { Button, Input, Card } from '../components/ui';
+import useSignup from '../hooks/useSignup';
 
 export const Signup: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -19,7 +20,10 @@ export const Signup: React.FC = () => {
     setErrors(newErrors);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { loading, signup } = useSignup();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
@@ -52,8 +56,15 @@ export const Signup: React.FC = () => {
       return;
     }
 
-    // Handle signup logic here
-    console.log('Signup:', formData);
+    const signupResult = await signup({
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword,
+    });
+    if (signupResult) {
+      navigate('/dashboard');
+    }
   };
 
   return (
@@ -132,8 +143,8 @@ export const Signup: React.FC = () => {
               </label>
             </div>
 
-            <Button type="submit" variant="primary" className="w-full" size="lg">
-              Create Account
+            <Button type="submit" variant="primary" className="w-full" size="lg" disabled={loading}>
+              {loading ? 'Creating...' : 'Create Account'}
             </Button>
           </form>
 

@@ -2,12 +2,15 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Code2, User, LogOut, Settings } from 'lucide-react';
 import { Button } from './ui';
+import { useLogout } from '../hooks/useLogout';
 
 export const Navbar: React.FC = () => {
   const navigate = useNavigate();
+  const { logout } = useLogout();
 
   const handleLogout = () => {
     // Handle logout logic
+    logout();
     navigate('/login');
   };
 
@@ -58,7 +61,7 @@ export const Navbar: React.FC = () => {
                 </div>
                 <span className="hidden md:block font-medium">User</span>
               </button>
-              
+
               {/* Dropdown Menu */}
               <div className="absolute right-0 mt-2 w-48 bg-dark-900 border border-dark-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 <div className="py-2">
