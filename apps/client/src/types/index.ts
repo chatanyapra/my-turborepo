@@ -21,3 +21,28 @@ export interface SignupData {
     password: string;
     confirmPassword: string;
 }
+
+// Problem Submission Types
+export interface Example {
+    input: string;
+    output: string;
+    explanation?: string;
+    image?: string;
+}
+
+export interface TestCase {
+    input: string;
+    expected_output: string;
+}
+
+export interface ProblemFormData {
+    title: string;
+    description: string;
+    difficulty: 'Easy' | 'Medium' | 'Hard';
+    constraints: string;
+    examples: Example[];
+    test_cases: TestCase[];
+    tags: string[];
+    time_limit: number;
+    memory_limit: number;
+}

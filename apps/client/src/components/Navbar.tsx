@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Code2, User, LogOut, Settings } from 'lucide-react';
+import { Code2, User, LogOut, Settings, Plus } from 'lucide-react';
 import { Button } from './ui';
 import { useLogout } from '../hooks/useLogout';
 
@@ -50,6 +50,15 @@ export const Navbar: React.FC = () => {
 
           {/* User Menu */}
           <div className="flex items-center space-x-4">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => navigate('/submit-problem')}
+              className="hidden md:flex"
+            >
+              <Plus size={18} className="mr-2" />
+              Submit Problem
+            </Button>
             <Button variant="ghost" size="sm" className="hidden md:flex">
               <Settings size={18} className="mr-2" />
               Settings

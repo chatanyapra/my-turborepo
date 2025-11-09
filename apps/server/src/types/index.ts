@@ -30,12 +30,18 @@ export interface Example {
   input: string;
   output: string;
   explanation?: string;
+  image?: string;
 }
 
 export interface TestCase {
   input: string;
   expectedOutput: string;
-  hidden: boolean;
+  hidden?: boolean;
+}
+
+export interface FrontendTestCase {
+  input: string;
+  expected_output: string;
 }
 
 export interface CreateProblemDTO {

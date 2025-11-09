@@ -24,28 +24,27 @@ export const loginSchema = z.object({
 
 // Problem Validators
 const exampleSchema = z.object({
-  input: z.string(),
-  output: z.string(),
+  input: z.string().min(1, 'Input is required'),
+  output: z.string().min(1, 'Output is required'),
   explanation: z.string().optional(),
+  image: z.string().url().optional().or(z.literal('')),
 });
 
 const testCaseSchema = z.object({
-  input: z.string(),
-  expectedOutput: z.string(),
-  hidden: z.boolean(),
+  input: z.string().min(1, 'Input is required'),
+  expected_output: z.string().min(1, 'Expected output is required'),
 });
 
 export const createProblemSchema = z.object({
-  title: z.string().min(1).max(255),
-  description: z.string().min(1),
+  title: z.string().min(1, 'Title is required').max(255),
+  description: z.string().min(1, 'Description is required'),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']),
-  constraints: z.string().optional(),
+  constraints: z.string().min(1, 'Constraints are required'),
   examples: z.array(exampleSchema).min(1, 'At least one example is required'),
-  testCases: z.array(testCaseSchema).min(1, 'At least one test case is required'),
-  tags: z.array(z.string()).optional(),
-  timeLimit: z.number().int().positive().optional(),
-  memoryLimit: z.number().int().positive().optional(),
-  createdBy: z.number().int().positive(),
+  test_cases: z.array(testCaseSchema).min(1, 'At least one test case is required'),
+  tags: z.array(z.string()).min(1, 'At least one tag is required'),
+  time_limit: z.number().int().positive().default(1),
+  memory_limit: z.number().int().positive().default(128),
 });
 
 export const updateProblemSchema = z.object({

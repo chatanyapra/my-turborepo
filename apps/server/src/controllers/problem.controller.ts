@@ -2,13 +2,46 @@ import { Request, Response } from 'express';
 import problemService from '../services/problem.service';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 
+interface AuthRequest extends Request {
+  user?: {
+    id: number;
+    email: string;
+  };
+}
+
 class ProblemController {
-  createProblem = asyncHandler(async (req: Request, res: Response) => {
-    const problem = await problemService.createProblem(req.body);
+  createProblem = asyncHandler(async (req: AuthRequest, res: Response) => {
+    // Extract user ID from JWT token
+    const userId = req.user?.id;
+    if (!userId) {
+      throw new AppError('User not authenticated', 401);
+    }
+
+    // Transform frontend format to backend format
+    const { test_cases, time_limit, memory_limit, ...rest } = req.body;
+    
+    // Convert test cases from frontend format to backend format
+    const testCases = test_cases.map((tc: any) => ({
+      input: tc.input,
+      expectedOutput: tc.expected_output,
+      hidden: false, // Default to not hidden
+    }));
+
+    const problemData = {
+      ...rest,
+      testCases,
+      timeLimit: time_limit || 1,
+      memoryLimit: memory_limit || 128,
+      createdBy: userId,
+    };
+
+    const problem = await problemService.createProblem(problemData);
+    
     res.status(201).json({
       success: true,
       message: 'Problem created successfully',
-      data: problem,
+      id: problem.id,
+      problemId: problem.id,
     });
   });
 
