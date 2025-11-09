@@ -6,6 +6,7 @@ export interface AuthUser {
     email: string;
     image?: string;
     token: string;
+    role?: string;
 }
 export interface AuthContextProps {
     authUser: AuthUser | null;
@@ -45,4 +46,30 @@ export interface ProblemFormData {
     tags: string[];
     time_limit: number;
     memory_limit: number;
+}
+
+// Database Problem Types
+export interface Problem {
+    id: number;
+    title: string;
+    description: string;
+    difficulty: 'Easy' | 'Medium' | 'Hard';
+    constraints: string;
+    examples: Example[];
+    testCases?: TestCase[];
+    tags: string[];
+    timeLimit: number;
+    memoryLimit: number;
+    createdBy: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface ProblemListItem {
+    id: number;
+    title: string;
+    difficulty: 'Easy' | 'Medium' | 'Hard';
+    tags: string[];
+    acceptance?: number;
+    solved?: boolean;
 }

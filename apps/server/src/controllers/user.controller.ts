@@ -36,7 +36,7 @@ class UserController {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -50,6 +50,7 @@ class UserController {
         id: user.id,
         email: user.email,
         username: user.username,
+        role: user.role,
       },
     });
   });
@@ -155,7 +156,7 @@ class UserController {
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -168,6 +169,7 @@ class UserController {
         id: user.id,
         email: user.email,
         username: user.username,
+        role: user.role,
       },
     });
   });

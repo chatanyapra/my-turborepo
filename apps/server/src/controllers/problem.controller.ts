@@ -127,7 +127,25 @@ class ProblemController {
 
   updateProblem = asyncHandler(async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
-    const problem = await problemService.updateProblem(id, req.body);
+    
+    // Transform frontend format to backend format
+    const { test_cases, time_limit, memory_limit, ...rest } = req.body;
+    
+    const updateData: any = { ...rest };
+    
+    // Convert test cases from frontend format to backend format if provided
+    if (test_cases) {
+      updateData.testCases = test_cases.map((tc: any) => ({
+        input: tc.input,
+        expectedOutput: tc.expected_output,
+        hidden: tc.hidden !== undefined ? tc.hidden : false,
+      }));
+    }
+    
+    if (time_limit !== undefined) updateData.timeLimit = time_limit;
+    if (memory_limit !== undefined) updateData.memoryLimit = memory_limit;
+    
+    const problem = await problemService.updateProblem(id, updateData);
 
     res.status(200).json({
       success: true,

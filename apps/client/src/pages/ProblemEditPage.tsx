@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Loader2, Send, ArrowLeft } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
@@ -11,11 +11,10 @@ import {
   DynamicTestCaseSection,
 } from '../components/common';
 import { Button } from '../components/ui';
-import { submitProblem } from '../api/problems';
+import { getProblemById, updateProblem } from '../api/problems';
 import { useAuthContext } from '../context/AuthContext';
 import type {
   ProblemFormData, Example,
-  // TestCase 
 } from '../types';
 
 interface FormErrors {
@@ -27,27 +26,14 @@ interface FormErrors {
   testCases?: Record<number, { input?: string; expected_output?: string }>;
 }
 
-export const ProblemSubmissionPage: React.FC = () => {
+export const ProblemEditPage: React.FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const { authUser } = useAuthContext();
 
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
-
-  // Check if user is admin
-  useEffect(() => {
-    if (!authUser) {
-      toast.error('You must be logged in to submit problems');
-      navigate('/login');
-      return;
-    }
-
-    if (authUser.role !== 'admin') {
-      toast.error('Only admins can submit problems');
-      navigate('/dashboard');
-      return;
-    }
-  }, [authUser, navigate]);
 
   const [formData, setFormData] = useState<ProblemFormData>({
     title: '',
@@ -62,6 +48,71 @@ export const ProblemSubmissionPage: React.FC = () => {
   });
 
   const [tagsInput, setTagsInput] = useState('');
+
+  // Check if user is admin
+  useEffect(() => {
+    if (!authUser) {
+      toast.error('You must be logged in to edit problems');
+      navigate('/login');
+      return;
+    }
+
+    if (authUser.role !== 'admin') {
+      toast.error('Only admins can edit problems');
+      navigate('/dashboard');
+      return;
+    }
+  }, [authUser, navigate]);
+
+  // Fetch problem data
+  useEffect(() => {
+    const fetchProblem = async () => {
+      if (!id) {
+        toast.error('Invalid problem ID');
+        navigate('/dashboard');
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const response = await getProblemById(parseInt(id));
+        if (response.success && response.data) {
+          const problem = response.data;
+          
+          // Transform backend format to form format
+          const testCases = problem.testCases?.map(tc => ({
+            input: tc.input,
+            expected_output: tc.expected_output,
+          })) || [{ input: '', expected_output: '' }];
+
+          setFormData({
+            title: problem.title,
+            description: problem.description,
+            difficulty: problem.difficulty,
+            constraints: problem.constraints,
+            examples: problem.examples.length > 0 ? problem.examples : [{ input: '', output: '', explanation: '', image: '' }],
+            test_cases: testCases,
+            tags: problem.tags,
+            time_limit: problem.timeLimit,
+            memory_limit: problem.memoryLimit,
+          });
+
+          setTagsInput(problem.tags.join(', '));
+        } else {
+          toast.error(response.error || 'Failed to load problem');
+          navigate('/dashboard');
+        }
+      } catch (error) {
+        console.error('Error fetching problem:', error);
+        toast.error('Failed to load problem');
+        navigate('/dashboard');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProblem();
+  }, [id, navigate]);
 
   const handleInputChange = (
     field: keyof ProblemFormData,
@@ -140,13 +191,13 @@ export const ProblemSubmissionPage: React.FC = () => {
     e.preventDefault();
 
     if (!authUser?.token) {
-      toast.error('You must be logged in to submit a problem');
+      toast.error('You must be logged in to update a problem');
       navigate('/login');
       return;
     }
 
     if (authUser.role !== 'admin') {
-      toast.error('Only admins can submit problems');
+      toast.error('Only admins can update problems');
       return;
     }
 
@@ -174,40 +225,38 @@ export const ProblemSubmissionPage: React.FC = () => {
         examples: cleanedExamples,
       };
 
-      const response = await submitProblem(submissionData, authUser.token);
+      const response = await updateProblem(parseInt(id!), submissionData, authUser.token);
 
       if (response.success) {
         toast.success(response.message);
-        // Reset form
-        setFormData({
-          title: '',
-          description: '',
-          difficulty: 'Easy',
-          constraints: '',
-          examples: [{ input: '', output: '', explanation: '', image: '' }],
-          test_cases: [{ input: '', expected_output: '' }],
-          tags: [],
-          time_limit: 1,
-          memory_limit: 128,
-        });
-        setTagsInput('');
-
-        // Navigate to the problem detail page if we have an ID
-        if (response.problemId) {
-          setTimeout(() => {
-            navigate(`/problems/${response.problemId}`);
-          }, 1500);
-        }
+        // Navigate back to the problem detail page
+        setTimeout(() => {
+          navigate(`/problems/${id}`);
+        }, 1500);
       } else {
         toast.error(response.message);
       }
     } catch (error: any) {
       toast.error('An unexpected error occurred. Please try again.');
-      console.error('Submission error:', error);
+      console.error('Update error:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-dark-950 flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="animate-spin text-primary-500 mx-auto mb-4" size={48} />
+            <p className="text-dark-400">Loading problem...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-dark-950 flex flex-col">
@@ -218,17 +267,17 @@ export const ProblemSubmissionPage: React.FC = () => {
           {/* Header */}
           <div className="mb-8">
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(`/problems/${id}`)}
               className="flex items-center gap-2 text-dark-400 hover:text-dark-200 transition-colors mb-4"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back
+              Back to Problem
             </button>
             <h1 className="text-3xl font-bold text-dark-50 mb-2">
-              Submit a New Problem
+              Edit Problem
             </h1>
             <p className="text-dark-400">
-              Create a new coding challenge for the community
+              Update the problem details below
             </p>
           </div>
 
@@ -358,7 +407,7 @@ export const ProblemSubmissionPage: React.FC = () => {
               <Button
                 type="button"
                 variant="ghost"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate(`/problems/${id}`)}
                 disabled={isSubmitting}
               >
                 Cancel
@@ -372,12 +421,12 @@ export const ProblemSubmissionPage: React.FC = () => {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    Submitting...
+                    Updating...
                   </>
                 ) : (
                   <>
                     <Send className="w-5 h-5 mr-2" />
-                    Submit Problem
+                    Update Problem
                   </>
                 )}
               </Button>
