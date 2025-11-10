@@ -11,6 +11,7 @@ import {
   DynamicTestCaseSection,
 } from '../components/common';
 import { Button } from '../components/ui';
+import { LanguageCodeSection } from '../components/problem';
 import { submitProblem } from '../api/problems';
 import { useAuthContext } from '../context/AuthContext';
 import type {
@@ -33,6 +34,7 @@ export const ProblemSubmissionPage: React.FC = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [createdProblemId, setCreatedProblemId] = useState<number | null>(null);
 
   // Check if user is admin
   useEffect(() => {
@@ -178,25 +180,11 @@ export const ProblemSubmissionPage: React.FC = () => {
 
       if (response.success) {
         toast.success(response.message);
-        // Reset form
-        setFormData({
-          title: '',
-          description: '',
-          difficulty: 'Easy',
-          constraints: '',
-          examples: [{ input: '', output: '', explanation: '', image: '' }],
-          test_cases: [{ input: '', expected_output: '' }],
-          tags: [],
-          time_limit: 1,
-          memory_limit: 128,
-        });
-        setTagsInput('');
-
-        // Navigate to the problem detail page if we have an ID
+        
+        // Set the created problem ID to enable code template management
         if (response.problemId) {
-          setTimeout(() => {
-            navigate(`/problems/${response.problemId}`);
-          }, 1500);
+          setCreatedProblemId(response.problemId);
+          toast.info('Problem created! You can now add code templates below.');
         }
       } else {
         toast.error(response.message);
@@ -366,7 +354,7 @@ export const ProblemSubmissionPage: React.FC = () => {
               <Button
                 type="submit"
                 variant="primary"
-                disabled={isSubmitting}
+                disabled={isSubmitting || createdProblemId !== null}
                 className="min-w-[150px]"
               >
                 {isSubmitting ? (
@@ -377,12 +365,33 @@ export const ProblemSubmissionPage: React.FC = () => {
                 ) : (
                   <>
                     <Send className="w-5 h-5 mr-2" />
-                    Submit Problem
+                    {createdProblemId ? 'Problem Created' : 'Submit Problem'}
                   </>
                 )}
               </Button>
             </div>
           </form>
+
+          {/* Language Code Templates Section */}
+          {authUser?.token && (
+            <LanguageCodeSection
+              problemId={createdProblemId}
+              token={authUser.token}
+            />
+          )}
+
+          {/* Navigation after code templates */}
+          {createdProblemId && (
+            <div className="flex items-center justify-end gap-4 mt-6">
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => navigate(`/problems/${createdProblemId}`)}
+              >
+                View Problem
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

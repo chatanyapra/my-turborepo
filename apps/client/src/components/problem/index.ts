@@ -7,6 +7,8 @@ export { CodeEditorPanel } from './CodeEditorPanel';
 export { TestCasesPanel } from './TestCasesPanel';
 export { OutputPanel } from './OutputPanel';
 export { LanguageSelector, languageMap } from './LanguageSelector';
+export { CodeEditor } from './CodeEditor';
+export { LanguageCodeSection } from './LanguageCodeSection';
 export type { Language } from './LanguageSelector';
 export type { EditorTab } from './EditorTabs';
 export type { ProblemTab } from './ProblemTabs';

@@ -72,3 +72,16 @@ export const updateSubmissionStatusSchema = z.object({
   runtime: z.number().int().optional(),
   memory: z.number().int().optional(),
 });
+
+// ProblemCode Validators
+export const createProblemCodeSchema = z.object({
+  problemId: z.number().int().positive(),
+  language: z.enum(['java', 'python', 'cpp', 'javascript']),
+  wrapperCode: z.string().min(1, 'Wrapper code is required'),
+  boilerplateCode: z.string().min(1, 'Boilerplate code is required'),
+});
+
+export const updateProblemCodeSchema = z.object({
+  wrapperCode: z.string().optional(),
+  boilerplateCode: z.string().optional(),
+});

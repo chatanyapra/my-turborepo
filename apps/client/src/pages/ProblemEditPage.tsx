@@ -11,6 +11,7 @@ import {
   DynamicTestCaseSection,
 } from '../components/common';
 import { Button } from '../components/ui';
+import { LanguageCodeSection } from '../components/problem';
 import { getProblemById, updateProblem } from '../api/problems';
 import { useAuthContext } from '../context/AuthContext';
 import type {
@@ -432,6 +433,14 @@ export const ProblemEditPage: React.FC = () => {
               </Button>
             </div>
           </form>
+
+          {/* Language Code Templates Section */}
+          {authUser?.token && id && (
+            <LanguageCodeSection
+              problemId={parseInt(id)}
+              token={authUser.token}
+            />
+          )}
         </div>
       </div>
     </div>
