@@ -5,6 +5,7 @@ import { app, server } from "./config/websocket";
 import userRoutes from './routes/user.routes';
 import problemRoutes from './routes/problem.routes';
 import submissionRoutes from './routes/submission.routes';
+import problemCodeRoutes from './routes/problemCode.routes';
 // import prisma from './lib/prisma';
 
 // Load environment variables
@@ -15,6 +16,7 @@ app.use("/api/submit", submitRoute);
 app.use("/api/users", userRoutes);
 app.use("/api/problems", problemRoutes);
 app.use("/api/submissions", submissionRoutes);
+app.use("/api/problem-codes", problemCodeRoutes);
 
 // Health check
 // app.get("/", async (req, res) => {

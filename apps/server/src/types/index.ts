@@ -123,3 +123,26 @@ export interface SubmissionStats {
   runtimeError: number;
   compilationError: number;
 }
+
+// ProblemCode Types
+export interface CreateProblemCodeDTO {
+  problemId: number;
+  language: string;
+  wrapperCode: string;
+  boilerplateCode: string;
+}
+
+export interface UpdateProblemCodeDTO {
+  wrapperCode?: string;
+  boilerplateCode?: string;
+}
+
+export interface ProblemCodeResponse {
+  id: number;
+  problemId: number;
+  language: string;
+  wrapperCode: string;
+  boilerplateCode: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

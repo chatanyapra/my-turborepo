@@ -8,7 +8,7 @@ class ProblemService {
         title: data.title,
         description: data.description,
         difficulty: data.difficulty,
-        constraints: data.constraints,
+        constraints: data.constraints || '',
         examples: data.examples as any,
         testCases: data.testCases as any,
         tags: data.tags || [],
@@ -113,7 +113,7 @@ class ProblemService {
 
   private formatProblem(problem: any, includeHidden: boolean): ProblemResponse {
     const testCases = problem.testCases as TestCase[];
-    
+
     return {
       id: problem.id,
       title: problem.title,
