@@ -47,6 +47,25 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           wordWrap: 'on',
           readOnly,
           placeholder,
+          // Enable copy/paste functionality
+          contextmenu: true,
+          selectOnLineNumbers: true,
+          roundedSelection: true,
+          cursorStyle: 'line',
+          copyWithSyntaxHighlighting: true,
+          // Additional options to ensure copy/paste works
+          quickSuggestions: false,
+          suggest: { showWords: false },
+          acceptSuggestionOnCommitCharacter: false,
+          acceptSuggestionOnEnter: 'off',
+          accessibilitySupport: 'off',
+          // Explicitly enable selection and clipboard
+          selectionHighlight: true,
+          occurrencesHighlight: 'off',
+          renderLineHighlight: 'all',
+          // Ensure no restrictions on editing
+          domReadOnly: readOnly,
+          readOnlyMessage: readOnly ? { value: 'Editor is read-only' } : undefined,
         }}
       />
     </div>

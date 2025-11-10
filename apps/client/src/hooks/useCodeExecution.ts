@@ -41,18 +41,40 @@ export const useCodeExecution = () => {
     };
   }, []);
 
-  const runCode = async (code: string) => {
+  const runCode = async (
+    code: string,
+    language: string = 'javascript',
+    problemId?: number,
+    testCases: any[] = []
+  ) => {
     setIsRunning(true);
     setOutput('Running test cases...\n');
 
     try {
       console.log("authUser?.token", authUser?.token);
+      console.log("COde---------", code);
+
+      console.log("Running code with:", { language, problemId, testCasesCount: testCases.length });
+
+      // Map language to Judge0 language ID
+      const languageMap: Record<string, number> = {
+        javascript: 63,  // Node.js
+        python: 71,      // Python 3
+        java: 62,        // Java
+        cpp: 54,         // C++
+      };
+
+      const language_id = languageMap[language] || 63;
+
+      // Use first test case for running (or empty if none)
+      const firstTestCase = testCases.length > 0 ? testCases[0] : { input: '', expected_output: '' };
 
       const { data } = await axios.post("http://localhost:3000/api/submit", {
         source_code: code,
-        language_id: 71,
-        stdin: "",
-        expected_output: ""
+        language_id,
+        stdin: firstTestCase.input || '',
+        expected_output: firstTestCase.expected_output || '',
+        problem_id: problemId
       }, {
         headers: {
           "Content-Type": "application/json",
@@ -78,24 +100,59 @@ export const useCodeExecution = () => {
     }
   };
 
-  const submitCode = (code: string) => {
+  const submitCode = async (
+    code: string,
+    language: string = 'javascript',
+    problemId?: number,
+    testCases: any[] = []
+  ) => {
     setIsRunning(true);
     setOutput('Submitting your solution...\n');
     console.log("code in submit button function", code);
+    console.log("Submitting with:", { language, problemId, testCasesCount: testCases.length });
 
+    try {
+      // Map language to Judge0 language ID
+      const languageMap: Record<string, number> = {
+        javascript: 63,  // Node.js
+        python: 71,      // Python 3
+        java: 62,        // Java
+        cpp: 54,         // C++ (GCC 9.2.0)
+      };
 
-    // Simulate code submission - Replace with actual API call
-    setTimeout(() => {
+      const language_id = languageMap[language] || 63;
 
-      setOutput(`Submitting your solution...
-          ✓ Accepted
+      // Submit with all test cases
+      const { data } = await axios.post("http://localhost:3000/api/submit", {
+        source_code: code,
+        language_id,
+        stdin: testCases.map(tc => tc.input).join('\n'),
+        expected_output: testCases.map(tc => tc.expected_output).join('\n'),
+        problem_id: problemId,
+        is_submission: true  // Flag to indicate this is a full submission
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authUser?.token}`,
+        },
+      });
 
-          Runtime: 52ms (Beats 95.2% of users)
-          Memory: 42.1MB (Beats 87.3% of users)
+      console.log("🚀 Submission job submitted:", data);
+      setToken(data.token);
+      socket.emit("subscribe", data.token, (ack: any) => {
+        console.log("🔗 Joined submission room:", ack);
+      });
 
-          All 58 test cases passed!`);
+      // Safety timeout
+      setTimeout(() => {
+        setIsRunning(false);
+      }, 30000); // Longer timeout for submissions
+
+    } catch (err: any) {
+      console.error("❌ Error submitting solution:", err);
+      setOutput("Error submitting solution. Please check your connection.");
       setIsRunning(false);
-    }, 2000);
+    }
   };
 
   return {

@@ -4,6 +4,7 @@ import { Navbar } from '../components/Navbar';
 import { Loader2, AlertCircle, Edit } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { getProblemById } from '../api/problems';
+import { getProblemCodeByLanguage } from '../api/problemCodes';
 import type { Problem } from '../types';
 import {
   ProblemDescription,
@@ -34,6 +35,9 @@ export const ProblemDetail: React.FC = () => {
   const [editorTab, setEditorTab] = useState<EditorTab>('code');
   const [language, setLanguage] = useState<Language>('javascript');
   const [code, setCode] = useState('');
+  const [boilerplateCode, setBoilerplateCode] = useState('');
+  const [wrapperCode, setWrapperCode] = useState('');
+  const [loadingCode, setLoadingCode] = useState(false);
 
   // Fetch problem from database
   useEffect(() => {
@@ -44,8 +48,6 @@ export const ProblemDetail: React.FC = () => {
         const response = await getProblemById(problemId);
         if (response.success && response.data) {
           setProblem(response.data);
-          // Set default starter code (empty for now, can be enhanced later)
-          setCode('// Write your solution here');
         } else {
           setError(response.error || 'Problem not found');
           toast.error(response.error || 'Failed to load problem');
@@ -62,22 +64,95 @@ export const ProblemDetail: React.FC = () => {
     fetchProblem();
   }, [problemId]);
 
+  // Fetch boilerplate code when language changes
+  useEffect(() => {
+    const fetchBoilerplateCode = async () => {
+      if (!problemId) return;
+      
+      setLoadingCode(true);
+      try {
+        const response = await getProblemCodeByLanguage(problemId, language);
+        
+        if (response.success && response.data) {
+          // Set boilerplate code as starter code
+          setBoilerplateCode(response.data.boilerplateCode);
+          setWrapperCode(response.data.wrapperCode);
+          setCode(response.data.boilerplateCode);
+          toast.success(`Loaded ${language} starter code`);
+        } else {
+          // No boilerplate found, use default
+          const defaultCode = getDefaultCode(language);
+          setBoilerplateCode(defaultCode);
+          setWrapperCode('');
+          setCode(defaultCode);
+          toast.info(`No starter code found for ${language}. Using default template.`);
+        }
+      } catch (err) {
+        console.error('Error fetching boilerplate code:', err);
+        const defaultCode = getDefaultCode(language);
+        setBoilerplateCode(defaultCode);
+        setWrapperCode('');
+        setCode(defaultCode);
+      } finally {
+        setLoadingCode(false);
+      }
+    };
+
+    fetchBoilerplateCode();
+  }, [problemId, language]);
+
   const { output, isRunning, runCode, submitCode } = useCodeExecution();
 
   const handleLanguageChange = (newLang: Language) => {
     setLanguage(newLang);
-    // TODO: Load language-specific starter code from database
-    setCode('// Write your solution here');
+    // Code will be loaded by useEffect
+  };
+
+  // Default code templates for each language
+  const getDefaultCode = (lang: Language): string => {
+    const templates: Record<Language, string> = {
+      javascript: `/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var solution = function(nums, target) {
+    // Write your code here
+    
+};`,
+      python: `class Solution:
+    def solution(self, nums: List[int], target: int) -> List[int]:
+        # Write your code here
+        pass`,
+      java: `class Solution {
+    public int[] solution(int[] nums, int target) {
+        // Write your code here
+        return new int[]{};
+    }
+}`,
+      cpp: `class Solution {
+public:
+    vector<int> solution(vector<int>& nums, int target) {
+        // Write your code here
+        return {};
+    }
+};`,
+    };
+    return templates[lang] || '// Write your solution here';
   };
 
   const handleRunCode = () => {
     setEditorTab('output');
-    runCode(code);
+    // Combine user code with wrapper code for execution
+    const fullCode = wrapperCode ? `${code}\n\n${wrapperCode}` : code;
+    runCode(fullCode, language, problemId, problem?.testCases || []);
   };
 
   const handleSubmit = () => {
     setEditorTab('output');
-    submitCode(code);
+    // Combine user code with wrapper code for submission
+    const fullCode = wrapperCode ? `${code}\n\n${wrapperCode}` : code;
+    submitCode(fullCode, language, problemId, problem?.testCases || []);
   };
 
   // Loading state

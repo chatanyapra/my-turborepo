@@ -113,6 +113,13 @@ class ProblemService {
 
   private formatProblem(problem: any, includeHidden: boolean): ProblemResponse {
     const testCases = problem.testCases as TestCase[];
+    
+    // Transform testCases to frontend format (expectedOutput -> expected_output)
+    const formattedTestCases = (includeHidden ? testCases : testCases.filter((tc) => !tc.hidden)).map(tc => ({
+      input: tc.input,
+      expected_output: tc.expectedOutput,
+      hidden: tc.hidden
+    }));
 
     return {
       id: problem.id,
@@ -121,7 +128,7 @@ class ProblemService {
       difficulty: problem.difficulty,
       constraints: problem.constraints,
       examples: problem.examples,
-      testCases: includeHidden ? testCases : testCases.filter((tc) => !tc.hidden),
+      testCases: formattedTestCases as any,
       tags: problem.tags,
       timeLimit: problem.timeLimit,
       memoryLimit: problem.memoryLimit,

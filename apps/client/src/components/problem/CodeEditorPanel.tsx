@@ -28,6 +28,22 @@ export const CodeEditorPanel: React.FC<CodeEditorPanelProps> = ({
         automaticLayout: true,
         tabSize: 2,
         wordWrap: 'on',
+        // Enable copy/paste functionality
+        contextmenu: true,
+        selectOnLineNumbers: true,
+        roundedSelection: true,
+        cursorStyle: 'line',
+        copyWithSyntaxHighlighting: true,
+        // Additional options to ensure copy/paste works
+        quickSuggestions: false,
+        suggest: { showWords: false },
+        acceptSuggestionOnCommitCharacter: false,
+        acceptSuggestionOnEnter: 'off',
+        accessibilitySupport: 'off',
+        // Explicitly enable selection and clipboard
+        selectionHighlight: true,
+        occurrencesHighlight: 'off',
+        renderLineHighlight: 'all',
       }}
     />
   );

@@ -8,64 +8,64 @@ datasource db {
 }
 
 model User {
-  id            Int           @id @default(autoincrement())
-  username      String        @unique @db.VarChar(50)
-  email         String        @unique @db.VarChar(100)
-  passwordHash  String        @map("password_hash") @db.Text
-  profileImage  String?       @map("profile_image") @db.Text
-  role          String        @default("user") @db.VarChar(20)
-  createdAt     DateTime      @default(now()) @map("created_at")
-  updatedAt     DateTime      @updatedAt @map("updated_at")
+  id           Int      @id @default(autoincrement())
+  username     String   @unique @db.VarChar(50)
+  email        String   @unique @db.VarChar(100)
+  passwordHash String   @map("password_hash") @db.Text
+  profileImage String?  @map("profile_image") @db.Text
+  role         String   @default("user") @db.VarChar(20)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  problems      Problem[]     @relation("UserProblems")
-  submissions   Submission[]
+  problems    Problem[]    @relation("UserProblems")
+  submissions Submission[]
 }
 
 model Problem {
-  id            Int           @id @default(autoincrement())
-  title         String        @db.VarChar(255)
-  description   String        @db.Text
-  difficulty    String        @db.VarChar(10)
-  constraints   String        @db.Text
-  examples      Json
-  testCases     Json          @map("test_cases")
-  tags          String[]      @db.Text
-  timeLimit     Int           @default(1) @map("time_limit")
-  memoryLimit   Int           @default(128) @map("memory_limit")
-  createdBy     Int           @map("created_by")
-  createdAt     DateTime      @default(now()) @map("created_at")
-  updatedAt     DateTime      @updatedAt @map("updated_at")
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  description String   @db.Text
+  difficulty  String   @db.VarChar(10)
+  constraints String   @db.Text
+  examples    Json
+  testCases   Json     @map("test_cases")
+  tags        String[] @db.Text
+  timeLimit   Int      @default(1) @map("time_limit")
+  memoryLimit Int      @default(128) @map("memory_limit")
+  createdBy   Int      @map("created_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  creator       User          @relation("UserProblems", fields: [createdBy], references: [id], onUpdate: Cascade, onDelete: Restrict)
-  submissions   Submission[]
-  problemCodes  ProblemCode[]
+  creator      User          @relation("UserProblems", fields: [createdBy], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  submissions  Submission[]
+  problemCodes ProblemCode[]
 }
 
 model Submission {
-  id          Int       @id @default(autoincrement())
-  userId      Int       @map("user_id")
-  problemId   Int       @map("problem_id")
-  code        String    @db.Text
-  language    String    @db.VarChar(20)
-  status      String    @db.VarChar(50)
-  runtime     Int?
-  memory      Int?
-  createdAt   DateTime  @default(now()) @map("created_at")
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  problemId Int      @map("problem_id")
+  code      String   @db.Text
+  language  String   @db.VarChar(20)
+  status    String   @db.VarChar(50)
+  runtime   Int?
+  memory    Int?
+  createdAt DateTime @default(now()) @map("created_at")
 
-  user        User      @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  problem     Problem   @relation(fields: [problemId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model ProblemCode {
-  id                Int       @id @default(autoincrement())
-  problemId         Int       @map("problem_id")
-  language          String    @db.VarChar(50)
-  wrapperCode       String    @map("wrapper_code") @db.Text
-  boilerplateCode   String    @map("boilerplate_code") @db.Text
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
+  id              Int      @id @default(autoincrement())
+  problemId       Int      @map("problem_id")
+  language        String   @db.VarChar(50)
+  wrapperCode     String   @map("wrapper_code") @db.Text
+  boilerplateCode String   @map("boilerplate_code") @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
-  problem           Problem   @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
   @@unique([problemId, language])
 }

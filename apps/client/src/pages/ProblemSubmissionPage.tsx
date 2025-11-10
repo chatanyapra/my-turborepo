@@ -89,18 +89,22 @@ export const ProblemSubmissionPage: React.FC = () => {
     // Validate required fields
     if (!formData.title.trim()) {
       newErrors.title = 'Title is required';
+      toast.warning('⚠️ Title is required');
     }
 
     if (!formData.description.trim()) {
       newErrors.description = 'Description is required';
+      toast.warning('⚠️ Description is required');
     }
 
     if (!formData.constraints.trim()) {
       newErrors.constraints = 'Constraints are required';
+      toast.warning('⚠️ Constraints are required');
     }
 
     if (formData.tags.length === 0) {
       newErrors.tags = 'At least one tag is required';
+      toast.warning('⚠️ At least one tag is required');
     }
 
     // Validate examples
@@ -108,9 +112,11 @@ export const ProblemSubmissionPage: React.FC = () => {
     formData.examples.forEach((example, index) => {
       if (!example.input.trim()) {
         exampleErrors[index] = { ...exampleErrors[index], input: 'Input is required' };
+        toast.warning(`⚠️ Example ${index + 1}: Input is required`);
       }
       if (!example.output.trim()) {
         exampleErrors[index] = { ...exampleErrors[index], output: 'Output is required' };
+        toast.warning(`⚠️ Example ${index + 1}: Output is required`);
       }
     });
     if (Object.keys(exampleErrors).length > 0) {
@@ -122,12 +128,14 @@ export const ProblemSubmissionPage: React.FC = () => {
     formData.test_cases.forEach((testCase, index) => {
       if (!testCase.input.trim()) {
         testCaseErrors[index] = { ...testCaseErrors[index], input: 'Input is required' };
+        toast.warning(`⚠️ Test Case ${index + 1}: Input is required`);
       }
       if (!testCase.expected_output.trim()) {
         testCaseErrors[index] = {
           ...testCaseErrors[index],
           expected_output: 'Expected output is required',
         };
+        toast.warning(`⚠️ Test Case ${index + 1}: Expected output is required`);
       }
     });
     if (Object.keys(testCaseErrors).length > 0) {
