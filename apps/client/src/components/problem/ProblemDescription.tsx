@@ -1,9 +1,9 @@
 import React from 'react';
 import { Badge } from '../ui';
-import type { ProblemDetail } from '../../data/mockProblemDetails';
+import type { Problem } from '../../types';
 
 interface ProblemDescriptionProps {
-  problem: ProblemDetail;
+  problem: Problem;
 }
 
 export const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
@@ -15,14 +15,15 @@ export const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem 
           <h1 className="text-2xl font-bold text-dark-50">
             {problem.id}. {problem.title}
           </h1>
-          <Badge variant={problem.difficulty}>{problem.difficulty}</Badge>
+          <Badge variant={problem.difficulty.toLowerCase() as 'easy' | 'medium' | 'hard'}>{problem.difficulty}</Badge>
         </div>
       </div>
 
       {/* Description */}
-      <div className="text-dark-300 leading-relaxed whitespace-pre-line">
-        {problem.description}
-      </div>
+      <div 
+        className="text-dark-300 leading-relaxed prose prose-invert max-w-none"
+        dangerouslySetInnerHTML={{ __html: problem.description }}
+      />
 
       {/* Examples */}
       <div className="space-y-4">
@@ -44,23 +45,30 @@ export const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem 
                   <span className="text-dark-300">{example.explanation}</span>
                 </div>
               )}
+              {example.image && (
+                <div className="mt-2">
+                  <img 
+                    src={example.image} 
+                    alt={`Example ${idx + 1}`}
+                    className="max-w-full h-auto rounded border border-dark-700"
+                  />
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
 
       {/* Constraints */}
-      <div>
-        <h3 className="text-lg font-semibold text-dark-50 mb-3">Constraints:</h3>
-        <ul className="space-y-2 text-dark-300">
-          {problem.constraints.map((constraint, idx) => (
-            <li key={idx} className="flex items-start">
-              <span className="text-primary-500 mr-2">•</span>
-              <span className="font-mono text-sm">{constraint}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {problem.constraints && (
+        <div>
+          <h3 className="text-lg font-semibold text-dark-50 mb-3">Constraints:</h3>
+          <div 
+            className="text-dark-300 prose prose-invert max-w-none"
+            dangerouslySetInnerHTML={{ __html: problem.constraints }}
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -2,13 +2,46 @@ import { Request, Response } from 'express';
 import problemService from '../services/problem.service';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 
+interface AuthRequest extends Request {
+  user?: {
+    id: number;
+    email: string;
+  };
+}
+
 class ProblemController {
-  createProblem = asyncHandler(async (req: Request, res: Response) => {
-    const problem = await problemService.createProblem(req.body);
+  createProblem = asyncHandler(async (req: AuthRequest, res: Response) => {
+    // Extract user ID from JWT token
+    const userId = req.user?.id;
+    if (!userId) {
+      throw new AppError('User not authenticated', 401);
+    }
+
+    // Transform frontend format to backend format
+    const { test_cases, time_limit, memory_limit, ...rest } = req.body;
+    
+    // Convert test cases from frontend format to backend format
+    const testCases = test_cases.map((tc: any) => ({
+      input: tc.input,
+      expectedOutput: tc.expected_output,
+      hidden: false, // Default to not hidden
+    }));
+
+    const problemData = {
+      ...rest,
+      testCases,
+      timeLimit: time_limit || 1,
+      memoryLimit: memory_limit || 128,
+      createdBy: userId,
+    };
+
+    const problem = await problemService.createProblem(problemData);
+    
     res.status(201).json({
       success: true,
       message: 'Problem created successfully',
-      data: problem,
+      id: problem.id,
+      problemId: problem.id,
     });
   });
 
@@ -94,7 +127,25 @@ class ProblemController {
 
   updateProblem = asyncHandler(async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
-    const problem = await problemService.updateProblem(id, req.body);
+    
+    // Transform frontend format to backend format
+    const { test_cases, time_limit, memory_limit, ...rest } = req.body;
+    
+    const updateData: any = { ...rest };
+    
+    // Convert test cases from frontend format to backend format if provided
+    if (test_cases) {
+      updateData.testCases = test_cases.map((tc: any) => ({
+        input: tc.input,
+        expectedOutput: tc.expected_output,
+        hidden: tc.hidden !== undefined ? tc.hidden : false,
+      }));
+    }
+    
+    if (time_limit !== undefined) updateData.timeLimit = time_limit;
+    if (memory_limit !== undefined) updateData.memoryLimit = memory_limit;
+    
+    const problem = await problemService.updateProblem(id, updateData);
 
     res.status(200).json({
       success: true,

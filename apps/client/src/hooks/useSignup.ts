@@ -42,7 +42,16 @@ const useSignup = () => {
             console.log("JSON.stringify(data.token)", JSON.stringify(data.token));
             if (data.token) {
                 localStorage.setItem("codura-token", JSON.stringify(data));
-                setAuthUser(data);
+                // Structure the auth user properly
+                const authUserData = {
+                    id: data.user.id,
+                    name: data.user.username,
+                    email: data.user.email,
+                    image: data.user.profile_image,
+                    token: data.token,
+                    role: data.user.role,
+                };
+                setAuthUser(authUserData);
                 toast.success("Signup successful! Welcome!");
                 return true;
             }

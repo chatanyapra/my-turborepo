@@ -36,9 +36,9 @@ class UserController {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '7d' }
     );
 
 
@@ -50,6 +50,7 @@ class UserController {
         id: user.id,
         email: user.email,
         username: user.username,
+        role: user.role,
       },
     });
   });
@@ -155,9 +156,9 @@ class UserController {
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' } // ⏱️ 1 hour expiration
+      { expiresIn: '7d' }
     );
 
     res.status(200).json({
@@ -168,6 +169,7 @@ class UserController {
         id: user.id,
         email: user.email,
         username: user.username,
+        role: user.role,
       },
     });
   });

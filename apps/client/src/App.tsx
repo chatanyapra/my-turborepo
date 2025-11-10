@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Login, Signup, Dashboard, ProblemDetail } from './pages';
+import { Login, Signup, Dashboard, ProblemDetail, ProblemSubmissionPage, ProblemEditPage } from './pages';
 import { useAuthContext } from './context/AuthContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -20,7 +20,10 @@ function App() {
           ) : (
             <>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/problem/:id" element={<ProblemDetail />} />
+              <Route path="/problems/:id" element={<ProblemDetail />} />
+              <Route path="/problems/:id/edit" element={<ProblemEditPage />} />
+              <Route path="/submit-problem" element={<ProblemSubmissionPage />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </>
           )
         }

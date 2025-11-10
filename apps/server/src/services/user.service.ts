@@ -137,8 +137,15 @@ class UserService {
   }
 
   private sanitizeUser(user: any): UserResponse {
-    const { passwordHash, ...sanitized } = user;
-    return sanitized;
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      profileImage: user.profile_image,
+      role: user.role,
+      createdAt: user.created_at,
+      updatedAt: user.updated_at,
+    };
   }
 }
 
