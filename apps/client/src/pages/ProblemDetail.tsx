@@ -27,7 +27,7 @@ export const ProblemDetail: React.FC = () => {
   const navigate = useNavigate();
   const { authUser } = useAuthContext();
   const problemId = parseInt(id || '1');
-  
+
   const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,9 +35,8 @@ export const ProblemDetail: React.FC = () => {
   const [editorTab, setEditorTab] = useState<EditorTab>('code');
   const [language, setLanguage] = useState<Language>('javascript');
   const [code, setCode] = useState('');
-  const [boilerplateCode, setBoilerplateCode] = useState('');
   const [wrapperCode, setWrapperCode] = useState('');
-  const [loadingCode, setLoadingCode] = useState(false);
+
 
   // Fetch problem from database
   useEffect(() => {
@@ -68,21 +67,18 @@ export const ProblemDetail: React.FC = () => {
   useEffect(() => {
     const fetchBoilerplateCode = async () => {
       if (!problemId) return;
-      
-      setLoadingCode(true);
+
       try {
         const response = await getProblemCodeByLanguage(problemId, language);
-        
+
         if (response.success && response.data) {
           // Set boilerplate code as starter code
-          setBoilerplateCode(response.data.boilerplateCode);
           setWrapperCode(response.data.wrapperCode);
           setCode(response.data.boilerplateCode);
           toast.success(`Loaded ${language} starter code`);
         } else {
           // No boilerplate found, use default
           const defaultCode = getDefaultCode(language);
-          setBoilerplateCode(defaultCode);
           setWrapperCode('');
           setCode(defaultCode);
           toast.info(`No starter code found for ${language}. Using default template.`);
@@ -90,11 +86,10 @@ export const ProblemDetail: React.FC = () => {
       } catch (err) {
         console.error('Error fetching boilerplate code:', err);
         const defaultCode = getDefaultCode(language);
-        setBoilerplateCode(defaultCode);
         setWrapperCode('');
         setCode(defaultCode);
       } finally {
-        setLoadingCode(false);
+        // Code loading completed
       }
     };
 
@@ -144,14 +139,14 @@ public:
   const handleRunCode = () => {
     setEditorTab('output');
     // Combine user code with wrapper code for execution
-    const fullCode = wrapperCode ? `${code}\n\n${wrapperCode}` : code;
+    const fullCode = wrapperCode ? `${wrapperCode}\n\n${code}` : code;
     runCode(fullCode, language, problemId, problem?.testCases || []);
   };
 
   const handleSubmit = () => {
     setEditorTab('output');
     // Combine user code with wrapper code for submission
-    const fullCode = wrapperCode ? `${code}\n\n${wrapperCode}` : code;
+    const fullCode = wrapperCode ? `${wrapperCode}\n\n${code}` : code;
     submitCode(fullCode, language, problemId, problem?.testCases || []);
   };
 

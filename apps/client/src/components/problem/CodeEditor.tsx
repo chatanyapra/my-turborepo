@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Editor from '@monaco-editor/react';
 
 interface CodeEditorProps {
@@ -25,8 +25,14 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   placeholder,
   readOnly = false,
 }) => {
+  const editorRef = useRef<any>(null);
+
   const handleEditorChange = (value: string | undefined) => {
     onChange(value || '');
+  };
+
+  const handleEditorDidMount = (editor: any) => {
+    editorRef.current = editor;
   };
 
   return (
@@ -36,6 +42,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         language={languageMap[language] || 'javascript'}
         value={value}
         onChange={handleEditorChange}
+        onMount={handleEditorDidMount}
         theme="vs-dark"
         options={{
           minimap: { enabled: false },
@@ -47,25 +54,15 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           wordWrap: 'on',
           readOnly,
           placeholder,
-          // Enable copy/paste functionality
+          // Simple clipboard configuration that works across browsers
           contextmenu: true,
           selectOnLineNumbers: true,
-          roundedSelection: true,
           cursorStyle: 'line',
-          copyWithSyntaxHighlighting: true,
-          // Additional options to ensure copy/paste works
+          // Disable features that might interfere with clipboard
           quickSuggestions: false,
           suggest: { showWords: false },
           acceptSuggestionOnCommitCharacter: false,
           acceptSuggestionOnEnter: 'off',
-          accessibilitySupport: 'off',
-          // Explicitly enable selection and clipboard
-          selectionHighlight: true,
-          occurrencesHighlight: 'off',
-          renderLineHighlight: 'all',
-          // Ensure no restrictions on editing
-          domReadOnly: readOnly,
-          readOnlyMessage: readOnly ? { value: 'Editor is read-only' } : undefined,
         }}
       />
     </div>
