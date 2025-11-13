@@ -9,7 +9,7 @@ class SubmissionService {
         problemId: data.problemId,
         code: data.code,
         language: data.language,
-        // status: 'Pending',
+        status: 'Pending',
       },
     });
 

@@ -191,7 +191,7 @@ public:
     <div className="min-h-screen bg-dark-950 flex flex-col">
       <Navbar />
 
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto fixed w-screen h-[calc(100vh-4.5rem)] top-16">
         {/* Left Panel - Problem Description */}
         <div className="lg:w-1/2 flex flex-col border-r border-dark-800 overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-dark-800">
@@ -208,7 +208,7 @@ public:
           </div>
           <ProblemTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-scroll p-6">
             {activeTab === 'description' && <ProblemDescription problem={problem} />}
             {activeTab === 'submissions' && (
               <div className="text-center py-12">
@@ -228,9 +228,9 @@ public:
             isRunning={isRunning}
           />
 
-          <EditorTabs activeTab={editorTab} onTabChange={setEditorTab} />
+          <EditorTabs activeTab={editorTab} onTabChange={setEditorTab} output={output} />
 
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto h-[calc(100vh-4.5rem)]">
             {editorTab === 'code' && (
               <CodeEditorPanel language={language} code={code} onChange={setCode} />
             )}

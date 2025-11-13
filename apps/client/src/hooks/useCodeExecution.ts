@@ -41,6 +41,7 @@ export const useCodeExecution = () => {
     };
   }, []);
 
+  // Run code by user function---------------------------------------
   const runCode = async (
     code: string,
     language: string = 'javascript',

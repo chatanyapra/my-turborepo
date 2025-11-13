@@ -20,7 +20,7 @@ export const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem 
       </div>
 
       {/* Description */}
-      <div 
+      <div
         className="text-dark-300 leading-relaxed prose prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: problem.description }}
       />
@@ -47,8 +47,8 @@ export const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem 
               )}
               {example.image && (
                 <div className="mt-2">
-                  <img 
-                    src={example.image} 
+                  <img
+                    src={example.image}
                     alt={`Example ${idx + 1}`}
                     className="max-w-full h-auto rounded border border-dark-700"
                   />
@@ -63,7 +63,7 @@ export const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem 
       {problem.constraints && (
         <div>
           <h3 className="text-lg font-semibold text-dark-50 mb-3">Constraints:</h3>
-          <div 
+          <div
             className="text-dark-300 prose prose-invert max-w-none"
             dangerouslySetInnerHTML={{ __html: problem.constraints }}
           />

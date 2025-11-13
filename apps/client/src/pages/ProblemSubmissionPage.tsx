@@ -188,7 +188,7 @@ export const ProblemSubmissionPage: React.FC = () => {
 
       if (response.success) {
         toast.success(response.message);
-        
+
         // Set the created problem ID to enable code template management
         if (response.problemId) {
           setCreatedProblemId(response.problemId);
